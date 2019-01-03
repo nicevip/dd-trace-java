@@ -24,6 +24,7 @@ import io.opentracing.ScopeManager;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.Format;
+import io.opentracing.tag.Tag;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -298,6 +299,11 @@ public class DDTracer implements io.opentracing.Tracer, Closeable, datadog.trace
   }
 
   @Override
+  public Scope activateSpan(final Span span) {
+    return scopeManager.activate(span);
+  }
+
+  @Override
   public DDSpanBuilder buildSpan(final String operationName) {
     return new DDSpanBuilder(operationName, scopeManager);
   }
@@ -384,8 +390,8 @@ public class DDTracer implements io.opentracing.Tracer, Closeable, datadog.trace
   }
 
   @Override
-  public void addScopeListener(ScopeListener listener) {
-    this.scopeManager.addScopeListener(listener);
+  public void addScopeListener(final ScopeListener listener) {
+    scopeManager.addScopeListener(listener);
   }
 
   @Override
@@ -492,6 +498,11 @@ public class DDTracer implements io.opentracing.Tracer, Closeable, datadog.trace
     @Override
     public DDSpanBuilder withTag(final String tag, final boolean bool) {
       return withTag(tag, (Object) bool);
+    }
+
+    @Override
+    public <T> SpanBuilder withTag(final Tag<T> tag, final T value) {
+      return withTag(tag.getKey(), value);
     }
 
     @Override
