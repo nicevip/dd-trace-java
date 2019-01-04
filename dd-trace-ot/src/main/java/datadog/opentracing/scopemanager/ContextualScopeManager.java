@@ -46,7 +46,8 @@ public class ContextualScopeManager implements ScopeManager {
 
   @Override
   public Span activeSpan() {
-    return active().span();
+    final Scope active = active();
+    return active == null ? null : active.span();
   }
 
   public void addScopeContext(final ScopeContext context) {
